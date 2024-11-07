@@ -1,5 +1,11 @@
 import { v4 as uuidv4 } from "uuid";
-import { User } from "./model/user";
+
+export interface User {
+  id: string;
+  username: string;
+  image: string;
+  email: string;
+}
 
 export const users: User[] = [
   {
@@ -11,7 +17,7 @@ export const users: User[] = [
   {
     id: uuidv4(),
     username: "Alicent",
-    image: "2.png",
+    image: "user_2.png",
     email: "alicent@sample.com",
   },
   {
@@ -27,3 +33,6 @@ export const users: User[] = [
     email: "bob@sample.com",
   },
 ];
+
+
+export const loggedInUser = users[0];

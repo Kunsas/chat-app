@@ -9,12 +9,11 @@ import { TooltipContent, TooltipTrigger } from "@radix-ui/react-tooltip";
 import { Button } from "@/components/ui/button";
 import { HoverCard, HoverCardContent } from "@/components/ui/hover-card";
 import { HoverCardTrigger } from "@radix-ui/react-hover-card";
-import { LogOut, UserCircle } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { users } from "@/app/data/users";
-import { User } from "@/app/data/model/user";
 import { useChat } from "../../../../hooks/useChat";
 import { ThemeToggle } from "@/components/ui/theme/theme-toggle";
+import { User, users } from "@/app/data/users";
 
 const MobileNavBar = () => {
   const { isActive } = useChat();
