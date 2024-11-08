@@ -8,22 +8,22 @@ export interface Community {
 
 export const communities: Community[] = [
   {
-    id: uuidv4(),
+    id: "1",
     name: "Alpha",
     image: "comm_1.png",
   },
   {
-    id: uuidv4(),
+    id: "2",
     name: "Beta",
     image: "comm_2.png",
   },
   {
-    id: uuidv4(),
+    id: "3",
     name: "Gamma",
     image: "comm_3.png",
   },
   {
-    id: uuidv4(),
+    id: "4",
     name: "Delta",
     image: "comm_4.png",
   },

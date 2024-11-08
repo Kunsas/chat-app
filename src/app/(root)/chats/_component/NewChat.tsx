@@ -20,7 +20,6 @@ import {
 import { useMediaQuery } from "../../../../../hooks/useMediaQuery";
 import { Plus } from "lucide-react";
 import { User, users } from "@/app/data/users";
-import { Chat } from "@/app/data/chats";
 
 type Props = {
   onNewChat: React.Dispatch<React.SetStateAction<User | null>>;

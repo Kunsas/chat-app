@@ -57,7 +57,7 @@ const MobileNavBar = () => {
             <HoverCardTrigger asChild>
               <Avatar>
                 <AvatarImage src={user.image} />
-                <AvatarFallback>{user.username}</AvatarFallback>
+                <AvatarFallback>{user.username.substring(0, 1)}</AvatarFallback>
               </Avatar>
             </HoverCardTrigger>
             <HoverCardContent className="w-80">
