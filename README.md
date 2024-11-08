@@ -1,8 +1,8 @@
 ## Overview
 
 ```bash
-# project setup
-npm install
+# install project dependencies
+npm install --legacy-peer-deps
 
 # run the project
 npm run dev 
