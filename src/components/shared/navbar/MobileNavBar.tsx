@@ -12,7 +12,7 @@ import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChat } from "../../../../hooks/useChat";
-import { ThemeToggle } from "@/components/ui/theme/theme-toggle";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User, users } from "@/app/data/users";
 
 const MobileNavBar = () => {
