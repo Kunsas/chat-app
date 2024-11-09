@@ -11,7 +11,12 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 import {
   Popover,
   PopoverContent,
@@ -19,7 +24,9 @@ import {
 } from "@/components/ui/popover";
 import { useMediaQuery } from "../../../../../hooks/useMediaQuery";
 import { Plus } from "lucide-react";
-import { User, users } from "@/app/data/users";
+import { User } from "@/app/store/types";
+import { useAppSelector } from "../../../../../hooks/useAppSelector";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type Props = {
   onNewChat: React.Dispatch<React.SetStateAction<User | null>>;
@@ -75,6 +82,7 @@ function UserList({
   setOpen: (open: boolean) => void;
   setSelectedUser: (user: User) => void;
 }) {
+  const users = useAppSelector((state) => state.users.users);
   return (
     <Command>
       <CommandInput placeholder="Search username" />
@@ -83,7 +91,7 @@ function UserList({
         <CommandGroup>
           {users.map((user) => (
             <CommandItem
-              key={user.id}
+              key={user.userId}
               value={user.username}
               onSelect={(value) => {
                 const user = users.find((user) => user.username === value);
@@ -93,6 +101,18 @@ function UserList({
                 }
               }}
             >
+              <Avatar>
+                <AvatarImage
+                  src={
+                    user.image === "group"
+                      ? user.username.substring(0, 1)
+                      : "/" + user.image
+                  }
+                  alt={user.username.substring(0, 1)}
+                  className="rounded-full"
+                />
+                <AvatarFallback>{user.username.substring(0, 1)}</AvatarFallback>
+              </Avatar>
               {user.username}
             </CommandItem>
           ))}

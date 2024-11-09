@@ -2,45 +2,88 @@
 
 import { v4 as uuidv4 } from "uuid";
 import ItemsList from "@/components/shared/item-list/ItemsList";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { NewChat } from "./_component/NewChat";
-import { loggedInUser, User } from "@/app/data/users";
-import { addChat, Chat, chats } from "@/app/data/chats";
 import ChatItem from "./_component/ChatItem";
 import { toast } from "sonner";
+import { Chat, ChatMember, Friend, Message, User } from "@/app/store/types";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
+import { useAppDispatch } from "../../../../hooks/useAppDispatch";
+import { createChat, deleteChat, findChatById } from "@/app/store/slices/chats";
+import { addFriend } from "@/app/store/slices/friends";
+import { createMessage } from "@/app/store/slices/messages";
+import { addChatMembers } from "@/app/store/slices/chatMembers";
+import MoreOptions from "@/components/shared/MoreOptions";
 type Props = React.PropsWithChildren<{}>;
 
 const ChatsLayout = ({ children }: Props) => {
-  const [currentChats, setCurrentChats] = useState<Chat[]>(chats);
   const [newParticipant, setNewParticipant] = useState<User | null>(null);
+  const [selectedOption, setSelectedOption] = React.useState<string>("");
+  const currentChats = useAppSelector((state) => state.chats.chats);
+  const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
+  const [chatIdToDelete, setChatIdToDelete] = useState<string>("");
+
+  const dispatch = useAppDispatch();
 
   const handleNewChat = (selectedUser: User) => {
-    const directChats = chats
-      .filter((chat) => !chat.isGroup)
-      .some((directChat) => {
-        console.log(directChat, selectedUser);
-        console.log(directChat.name === selectedUser.username);
-        return directChat.name === selectedUser.username;
-      });
+    const directChats = currentChats.some((chat) => {
+      const isDirectChat = !chat.isGroup;
+      const isSameUser = chat.name === selectedUser.username;
+      console.log("Checking direct chat:", { chat, isDirectChat, isSameUser });
+      return isDirectChat && isSameUser;
+    });
     console.log("Duplicate", directChats);
+    console.log(currentChats);
     if (directChats) {
       console.log("inside point");
       toast.error("Chat with selected participant already exists");
-      // toast.error("Chat with selected participant already exists.");
     } else {
+      const placeholderMessage: Message = {
+        senderId: selectedUser.userId,
+        chatId: uuidv4(),
+        type: "string",
+        content: [
+          "heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+        ],
+      };
       const newChat: Chat = {
-        id: (currentChats.length + 1).toString(),
+        chatId: placeholderMessage.chatId,
         isGroup: false,
         name: selectedUser.username,
         image: selectedUser.image,
-        participants: [loggedInUser, selectedUser],
-        lastSentMessage: "Sample last message",
+        lastMessage:
+          placeholderMessage.content[placeholderMessage.content.length - 1],
       };
-      addChat(newChat, chats);
+      const newFriend: Friend = {
+        sender: selectedUser,
+        receiver: loggedInUser,
+        chatId: placeholderMessage.chatId,
+      };
+      const loggedInUserAsChatMember: ChatMember = {
+        memberId: loggedInUser.userId,
+        chatId: newChat.chatId,
+        lastSeenMessage:
+          placeholderMessage.content[placeholderMessage.content.length - 1],
+      };
+      const newParticipantAsChatMember: ChatMember = {
+        memberId: selectedUser.userId,
+        chatId: newChat.chatId,
+        lastSeenMessage:
+          placeholderMessage.content[placeholderMessage.content.length - 1],
+      };
+      dispatch(createMessage(placeholderMessage));
+      dispatch(createChat(newChat));
+      dispatch(addFriend(newFriend));
+      dispatch(addChatMembers(loggedInUserAsChatMember));
+      dispatch(addChatMembers(newParticipantAsChatMember));
       toast.success(`Chat with ${selectedUser.username} created!`);
       setNewParticipant(null);
     }
-    console.log(currentChats);
+  };
+
+  const handleDeleteChat = (chatIdSelected: string) => {
+    dispatch(deleteChat(chatIdSelected));
+    toast.success("Chat deleted successfully!");
   };
 
   React.useEffect(() => {
@@ -48,7 +91,12 @@ const ChatsLayout = ({ children }: Props) => {
       handleNewChat(newParticipant);
       setNewParticipant(null);
     }
-  }, [newParticipant]);
+    if (chatIdToDelete && selectedOption === "Delete") {
+      handleDeleteChat(chatIdToDelete);
+      setSelectedOption("");
+      setChatIdToDelete("");
+    }
+  }, [newParticipant, chatIdToDelete, selectedOption]);
 
   return (
     <>
@@ -58,29 +106,29 @@ const ChatsLayout = ({ children }: Props) => {
       >
         {currentChats.length === 0 ? (
           <p className="w-full h-full flex items-center justify-center">
-            No chats found
+            Start chat with a new participant !
           </p>
         ) : (
           currentChats.map((chat) => {
             return chat.isGroup ? (
               <ChatItem
-                key={chat.id}
-                id={chat.id}
+                key={chat.chatId}
+                id={chat.chatId}
                 username={chat.name || ""}
                 image={chat.image}
-                lastMessageContent={chat.lastSentMessage}
-                lastMessageSender={loggedInUser.username}
-                // lastMessageSender={chat.lastSentMessageId?.sender}
+                lastMessageContent={chat.lastMessage}
+                onOptionSelect={setSelectedOption}
+                setChatIdToDelete={setChatIdToDelete}
               />
             ) : (
               <ChatItem
-                key={chat.id}
-                id={chat.id}
+                key={chat.chatId}
+                id={chat.chatId}
                 username={chat.name || ""}
                 image={chat.image}
-                lastMessageContent={chat.lastSentMessage}
-                lastMessageSender={loggedInUser.username}
-                // lastMessageSender={chat.lastSentMessageId?.sender}
+                lastMessageContent={chat.lastMessage}
+                onOptionSelect={setSelectedOption}
+                setChatIdToDelete={setChatIdToDelete}
               />
             );
           })
