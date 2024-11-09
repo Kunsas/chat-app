@@ -12,8 +12,8 @@ import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useChat } from "../../../../hooks/useChat";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { User, users } from "@/app/data/users";
+import { ThemeToggler } from "../ThemeToggler";
 
 const MobileNavBar = () => {
   const { isActive } = useChat();
@@ -51,7 +51,7 @@ const MobileNavBar = () => {
               </li>
             );
           })}
-          <ThemeToggle />
+          <ThemeToggler />
           {/* <UserCircle /> */}
           <HoverCard>
             <HoverCardTrigger asChild>

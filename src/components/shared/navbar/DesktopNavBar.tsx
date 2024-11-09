@@ -11,8 +11,9 @@ import { HoverCard, HoverCardContent } from "@/components/ui/hover-card";
 import { HoverCardTrigger } from "@radix-ui/react-hover-card";
 import { LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ThemeToggle } from "@/components/theme/theme-toggle";
+
 import { User, users } from "@/app/data/users";
+import { ThemeToggler } from "../ThemeToggler";
 
 const DesktopNavBar = () => {
   const paths = useNavigation();
@@ -46,7 +47,7 @@ const DesktopNavBar = () => {
       </nav>
       <div className="flex flex-col items-center gap-4">
         {/* <UserCircle /> */}
-        <ThemeToggle />
+        <ThemeToggler />
         <HoverCard>
           <HoverCardTrigger asChild>
             <Avatar>
