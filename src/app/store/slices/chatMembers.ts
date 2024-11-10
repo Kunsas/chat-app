@@ -3,9 +3,9 @@ import { ChatMember } from "../types";
 
 interface ChatMembersState {
   chatMembers: ChatMember[];
-  foundChatMembersByMemberId?: ChatMember | null;
-  foundChatMembersByChatId?: ChatMember | null;
-  foundChatMembersByMemberIdAndChatId?: ChatMember | null;
+  foundChatMembersByMemberId?: ChatMember[] | null;
+  foundChatMembersByChatId?: ChatMember[] | null;
+  foundChatMembersByMemberIdAndChatId?: ChatMember[] | null;
 }
 
 const initialState: ChatMembersState = {
@@ -22,7 +22,7 @@ export const chatMembersSlice = createSlice({
     },
     // takes ChatMember's memberId
     findChatMembersByMemberId: (state, action: PayloadAction<string>) => {
-      state.foundChatMembersByMemberId = state.chatMembers.find(
+      state.foundChatMembersByMemberId = state.chatMembers.filter(
         (chatMember) => {
           chatMember.memberId === action.payload;
         }
@@ -30,38 +30,29 @@ export const chatMembersSlice = createSlice({
     },
     // takes ChatMember's chatId
     findChatMembersByChatId: (state, action: PayloadAction<string>) => {
-      state.foundChatMembersByChatId = state.chatMembers.find((chatMember) => {
-        chatMember.chatId === action.payload;
-      });
+      state.foundChatMembersByChatId = state.chatMembers.filter(
+        (chatMember) => {
+          chatMember.chatId === action.payload;
+        }
+      );
     },
     // takes ChatMember's memberId and chatId
     findChatMembersByMemberIdAndChatId: (
       state,
       action: PayloadAction<{ memberId: string; chatId: string }>
     ) => {
-      state.foundChatMembersByChatId = state.chatMembers.find((chatMember) => {
-        chatMember.memberId === action.payload.memberId &&
-          chatMember.chatId === action.payload.chatId;
-      });
+      state.foundChatMembersByChatId = state.chatMembers.filter(
+        (chatMember) => {
+          chatMember.memberId === action.payload.memberId &&
+            chatMember.chatId === action.payload.chatId;
+        }
+      );
     },
     // takes ChatMember's memberId and chatId
-    deleteChatMembersByMemberIdAndChatId: (
-      state,
-      action: PayloadAction<{ memberId: string; chatId: string }>
-    ) => {
-      if (
-        state.foundChatMembersByMemberId?.memberId ===
-          action.payload.memberId &&
-        state.foundChatMembersByChatId?.chatId === action.payload.chatId
-      ) {
-        state.foundChatMembersByMemberId = null;
-        state.foundChatMembersByChatId = null;
-        state.foundChatMembersByMemberIdAndChatId = null;
-      }
-      state.chatMembers = state.chatMembers.filter((chatMember) => {
-        chatMember.memberId === action.payload.memberId &&
-          chatMember.chatId === action.payload.chatId;
-      });
+    deleteChatMembersByChatId: (state, action: PayloadAction<string>) => {
+      state.chatMembers = state.chatMembers.filter(
+        (chatMember) => !(chatMember.chatId === action.payload)
+      );
     },
   },
 });
@@ -71,5 +62,6 @@ export const {
   findChatMembersByMemberId,
   findChatMembersByChatId,
   findChatMembersByMemberIdAndChatId,
+  deleteChatMembersByChatId,
 } = chatMembersSlice.actions;
 export default chatMembersSlice.reducer;

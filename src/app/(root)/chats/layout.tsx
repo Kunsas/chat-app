@@ -10,9 +10,15 @@ import { Chat, ChatMember, Friend, Message, User } from "@/app/store/types";
 import { useAppSelector } from "../../../../hooks/useAppSelector";
 import { useAppDispatch } from "../../../../hooks/useAppDispatch";
 import { createChat, deleteChat, findChatById } from "@/app/store/slices/chats";
-import { addFriend } from "@/app/store/slices/friends";
-import { createMessage } from "@/app/store/slices/messages";
-import { addChatMembers } from "@/app/store/slices/chatMembers";
+import { addFriend, deleteFriendsByChatId } from "@/app/store/slices/friends";
+import {
+  createMessage,
+  deleteMessagesByChatId,
+} from "@/app/store/slices/messages";
+import {
+  addChatMembers,
+  deleteChatMembersByChatId,
+} from "@/app/store/slices/chatMembers";
 import MoreOptions from "@/components/shared/MoreOptions";
 type Props = React.PropsWithChildren<{}>;
 
@@ -82,7 +88,10 @@ const ChatsLayout = ({ children }: Props) => {
   };
 
   const handleDeleteChat = (chatIdSelected: string) => {
+    dispatch(deleteMessagesByChatId(chatIdSelected));
     dispatch(deleteChat(chatIdSelected));
+    dispatch(deleteFriendsByChatId(chatIdSelected));
+    dispatch(deleteChatMembersByChatId(chatIdSelected));
     toast.success("Chat deleted successfully!");
   };
 
