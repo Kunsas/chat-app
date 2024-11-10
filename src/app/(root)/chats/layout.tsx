@@ -124,7 +124,8 @@ const ChatsLayout = ({ children }: Props) => {
                 key={chat.chatId}
                 id={chat.chatId}
                 username={chat.name || ""}
-                image={chat.image}
+                image={loggedInUser.image}
+                lastMessageSender={loggedInUser.username || ""}
                 lastMessageContent={chat.lastMessage}
                 onOptionSelect={setSelectedOption}
                 setChatIdToDelete={setChatIdToDelete}
@@ -134,7 +135,8 @@ const ChatsLayout = ({ children }: Props) => {
                 key={chat.chatId}
                 id={chat.chatId}
                 username={chat.name || ""}
-                image={chat.image}
+                image={loggedInUser.image}
+                lastMessageSender={loggedInUser.username || ""}
                 lastMessageContent={chat.lastMessage}
                 onOptionSelect={setSelectedOption}
                 setChatIdToDelete={setChatIdToDelete}
