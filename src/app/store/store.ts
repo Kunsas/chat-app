@@ -4,6 +4,7 @@ import friendsReducer from "./slices/friends";
 import chatsReducer from "./slices/chats";
 import chatMembersReducer from "./slices/chatMembers";
 import messagesReducer from "./slices/messages";
+import messageFromUsersReducer from "./slices/messageFromUsers";
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     chats: chatsReducer,
     chatMembers: chatMembersReducer,
     messages: messagesReducer,
+    messageFromUsers: messageFromUsersReducer,
   },
 });
 

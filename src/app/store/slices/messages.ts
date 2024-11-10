@@ -3,7 +3,9 @@ import { Message } from "../types";
 
 interface MessagesState {
   messages: Message[];
-  foundMessageByChatId?: Message | null;
+  foundMessageByChatId?: Message;
+  foundMessagesBySenderId?: Message;
+  foundContentOfMessagesByChatId?: string[];
 }
 
 const initialState: MessagesState = {
@@ -18,11 +20,45 @@ export const messagesSlice = createSlice({
     createMessage: (state, action: PayloadAction<Message>) => {
       state.messages.push(action.payload);
     },
-    // takes Message's chatId
-    findChatMembersByChatId: (state, action: PayloadAction<string>) => {
-      state.foundMessageByChatId = state.messages.find((message) => {
-        message.chatId === action.payload;
+    // takes Message's messageId and message
+    updateContentInMessagesByMessageId: (
+      state,
+      action: PayloadAction<{ messageId: string; messageContent: string }>
+    ) => {
+      console.log(action.payload.messageId, action.payload.messageContent);
+      state.messages = state.messages.map((message) => {
+        if (message.messageId === action.payload.messageId) {
+          const updatedContent = message.content ? [...message.content] : [];
+          updatedContent.push(action.payload.messageContent);
+          return {
+            ...message,
+            content: updatedContent,
+          };
+        }
+        return message;
       });
+    },
+    // takes Message's chatId
+    findMessagesByChatId: (state, action: PayloadAction<string>) => {
+      state.foundMessageByChatId = state.messages.find(
+        (message) => message.chatId === action.payload
+      );
+    },
+    // takes Messages's chatId
+    findContentOfMessagesByChatId: (state, action: PayloadAction<string>) => {
+      const message = state.messages.find(
+        (msg) => msg.chatId === action.payload
+      );
+      if (message) {
+        state.foundContentOfMessagesByChatId = message.content;
+      } else {
+        state.foundContentOfMessagesByChatId = [];
+      }
+    },
+    findMessagesBySenderId: (state, action: PayloadAction<string>) => {
+      state.foundMessagesBySenderId = state.messages.find(
+        (message) => message.senderId === action.payload
+      );
     },
     // takes Message's chatId
     deleteMessagesByChatId: (state, action: PayloadAction<string>) => {
@@ -35,7 +71,10 @@ export const messagesSlice = createSlice({
 
 export const {
   createMessage,
-  findChatMembersByChatId,
+  updateContentInMessagesByMessageId,
+  findMessagesByChatId,
   deleteMessagesByChatId,
+  findMessagesBySenderId,
+  findContentOfMessagesByChatId,
 } = messagesSlice.actions;
 export default messagesSlice.reducer;

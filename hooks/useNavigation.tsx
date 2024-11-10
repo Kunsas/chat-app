@@ -8,7 +8,7 @@ export const useNavigation = () => {
   const paths = useMemo(
     () => [
       {
-        name: "Blend",
+        name: "Teams",
         href: "/",
         icon: <Blend />,
         active: pathname == "/",

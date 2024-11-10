@@ -5,7 +5,8 @@ export const useChat = () => {
   const params = useParams();
 
   const chatId = useMemo(
-    () => params?.chatId || ("" as string),
+    () =>
+      Array.isArray(params?.chatId) ? params.chatId[0] : params?.chatId || "",
     [params?.chatId]
   );
 

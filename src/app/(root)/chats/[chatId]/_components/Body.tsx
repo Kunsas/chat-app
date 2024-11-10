@@ -1,74 +1,52 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { useChat } from "../../../../../../hooks/useChat";
-import { Message as M, MessageWithUser } from "@/app/data/messages";
-import Message from "./Message";
-import { loggedInUser, users } from "@/app/data/users";
+import { useEffect } from "react";
+import { useAppDispatch } from "../../../../../../hooks/useAppDispatch";
+import { useAppSelector } from "../../../../../../hooks/useAppSelector";
+import MessageTile from "./MessageTile";
 
-type Props = {};
+import { Chat, Message } from "@/app/store/types";
+import ContainerFallback from "@/components/shared/ContainerFallback";
+import { findMessageFromUsersByChatId } from "@/app/store/slices/messageFromUsers";
 
-const Body = (props: Props) => {
-  const { chatId } = useChat();
+type Props = {
+  currentChat: Chat;
+};
 
-  const [messageWithUser, setMessageWithUser] = useState<MessageWithUser[]>([]);
+const Body = ({ currentChat }: Props) => {
+  const dispatch = useAppDispatch();
+  const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
+  const messagesInCurrentChat = useAppSelector(
+    (state) => state.messageFromUsers.foundMessageFromUsersByChatId
+  );
+
+  console.log(messagesInCurrentChat);
 
   useEffect(() => {
-    const initializeMessagesWithUser = async () => {
-      const messages = [
-        {
-          id: "1",
-          senderId: loggedInUser.id,
-          type: "text",
-          creationTime: Date.now(),
-          chatId: "2",
-          messageType: "text",
-          content: ["hi"],
-        },
-      ];
-
-      const getUserData = (senderId: string) => {
-          return users[parseInt(senderId)];
-      };
-
-      const messagesWithUser = messages.map((message) => {
-        const user = getUserData(message.senderId)
-        const isCurrentUser = message.senderId === loggedInUser.id;
-
-        return {
-          message,
-          senderImage: user.image,
-          senderName: user.username,
-          isCurrentUser,
-        };
-      });
-
-      setMessageWithUser(messagesWithUser);
-    };
-
-    initializeMessagesWithUser();
-  }, []);
+    dispatch(findMessageFromUsersByChatId(currentChat.chatId));
+  }, [currentChat.chatId]);
 
   return (
     <div className="w-full flex flex-1 overflow-y-scroll flex-col-reverse gap-2 p-3 no-scrollbar">
-      {messageWithUser?.map(
-        ({ message, senderImage, senderName, isCurrentUser }, index) => {
-          const lastByUser =
-            messageWithUser[index - 1]?.message.senderId ===
-            messageWithUser[index]?.message.senderId;
-          return (
-            <Message
-              key={message.id}
-              fromCurrentLoggedInUser={isCurrentUser}
-              senderImage={senderImage}
-              senderName={senderName}
-              lastByUser={lastByUser}
-              content={message.content}
-              createdAt={message.creationTime}
-              type={message.type}
-            />
-          );
-        }
+      {messagesInCurrentChat && messagesInCurrentChat.length > 0 ? (
+        messagesInCurrentChat.map((message) => (
+          <MessageTile
+            key={message.message.messageId}
+            fromCurrentLoggedInUser={
+              message.message.senderId === loggedInUser.userId
+            }
+            senderImage={message.message.senderImage}
+            senderName={message.message.senderName}
+            lastByUser={message.message.senderId === loggedInUser.userId}
+            content={message.message.message}
+            createdAt={message.message.timestamp}
+            type={message.message.type}
+          />
+        ))
+      ) : (
+        <span className="flex justify-center items-center w-full h-full text-muted-foreground">
+          Start a conversation
+        </span>
       )}
     </div>
   );

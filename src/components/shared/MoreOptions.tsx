@@ -17,13 +17,15 @@ import { EllipsisVertical, Eye, Trash2, User } from "lucide-react";
 
 type Props = {
   chatId: string;
-  onDeleteChatSelected: React.Dispatch<React.SetStateAction<string>>;
+  onOptionSelect: React.Dispatch<React.SetStateAction<string>>;
   setChatIdToDelete: React.Dispatch<React.SetStateAction<string>>;
+  setChatIdToRead: React.Dispatch<React.SetStateAction<string>>;
 };
 
 const MoreOptions = ({
   chatId,
-  onDeleteChatSelected,
+  onOptionSelect,
+  setChatIdToRead,
   setChatIdToDelete,
 }: Props) => {
   const [open, setOpen] = React.useState(false);
@@ -31,16 +33,19 @@ const MoreOptions = ({
 
   React.useEffect(() => {
     if (selectedOption === "Delete") {
-      onDeleteChatSelected(selectedOption);
+      onOptionSelect(selectedOption);
       setChatIdToDelete(chatId);
+    } else if (selectedOption === "Mark as read") {
+      onOptionSelect(selectedOption);
+      setChatIdToRead(chatId);
     }
-  }, [selectedOption, chatId, onDeleteChatSelected, setChatIdToDelete]);
+  }, [selectedOption, chatId, setChatIdToDelete, setChatIdToRead]);
 
   return (
     <div>
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant="outline">
+          <Button size="sm" variant="ghost">
             <EllipsisVertical />
           </Button>
         </DropdownMenuTrigger>
@@ -50,6 +55,7 @@ const MoreOptions = ({
             setOpen={setOpen}
             setSelectedOption={setSelectedOption}
             setChatIdToDelete={setChatIdToDelete}
+            setChatIdToRead={setChatIdToRead}
           />
         </DropdownMenuContent>
       </DropdownMenu>
@@ -64,11 +70,13 @@ function OptionList({
   setOpen,
   setSelectedOption,
   setChatIdToDelete,
+  setChatIdToRead,
 }: {
   chatId: string;
   setOpen: (open: boolean) => void;
   setSelectedOption: (selectedOption: string) => void;
   setChatIdToDelete: React.Dispatch<React.SetStateAction<string>>;
+  setChatIdToRead: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const options: string[] = ["Mark as read", "Delete"];
   return (
@@ -83,6 +91,9 @@ function OptionList({
                 if (value === "Delete") {
                   setSelectedOption("Delete");
                   setChatIdToDelete(chatId);
+                } else if (value == "Mark as read") {
+                  setSelectedOption("Mark as read");
+                  setChatIdToRead(chatId);
                 }
                 setOpen(false);
               }}

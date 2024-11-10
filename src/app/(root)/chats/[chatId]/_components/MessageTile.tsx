@@ -9,12 +9,12 @@ type Props = {
   senderImage: string;
   senderName: string;
   lastByUser: boolean;
-  content: string[];
-  createdAt: number;
+  content?: string;
+  createdAt: string;
   type: string;
 };
 
-const Message = ({
+const MessageTile = ({
   fromCurrentLoggedInUser,
   senderImage,
   senderName,
@@ -23,10 +23,6 @@ const Message = ({
   createdAt,
   type,
 }: Props) => {
-  const formatTime = (timestamp: number) => {
-    return format(timestamp, "HH:mm");
-  };
-
   return (
     <div
       className={cn("flex items-end", {
@@ -59,7 +55,7 @@ const Message = ({
                 !fromCurrentLoggedInUser,
             })}
           >
-            {formatTime(createdAt)}
+            {createdAt}
           </p>
         </div>
       </div>
@@ -68,7 +64,7 @@ const Message = ({
         className={cn("relative w-8 h-8", {
           "order-2": fromCurrentLoggedInUser,
           "order-1": !fromCurrentLoggedInUser,
-          invisible: lastByUser,
+          // invisible: lastByUser,
         })}
       >
         <AvatarImage src={"/" + senderImage} />
@@ -78,4 +74,4 @@ const Message = ({
   );
 };
 
-export default Message;
+export default MessageTile;

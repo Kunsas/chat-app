@@ -1,28 +1,31 @@
 "use client";
 
-import { chats } from "@/app/data/chats";
 import WrapperContainer from "@/components/shared/WrapperContainer";
 import { Loader2 } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "./_components/Header";
 import Body from "./_components/Body";
 import ChatInput from "./_components/ChatInput";
 import { useParams } from "next/navigation";
 import { useAppSelector } from "../../../../../hooks/useAppSelector";
+import { useChat } from "../../../../../hooks/useChat";
+import { useAppDispatch } from "../../../../../hooks/useAppDispatch";
+import { findChatById } from "@/app/store/slices/chats";
 
 const ChatPage = () => {
-  const params = useParams();
-  const chatId = params.chatId as string;
+  const chatId = useChat().chatId;
 
-  const currentChat = useAppSelector((state) =>
-    state.chats.chats.find((chat) => chat.chatId === chatId)
-  );
-  console.log(chatId)
-  console.log(currentChat);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(findChatById(chatId));
+  }, [chatId]);
+
+  const currentChat = useAppSelector((state) => state.chats.foundChatByChatId);
 
   return currentChat === undefined ? (
     <div className="w-full h-full flex items-center justify-center">
-      <Loader2 className="h-8 w-8" />
+      <Loader2 className="h-8 w-8 animate-spin" />
     </div>
   ) : currentChat === null ? (
     <p className="w-full h-full flex items-center justify-center">
@@ -31,7 +34,7 @@ const ChatPage = () => {
   ) : (
     <WrapperContainer>
       <Header name={currentChat.name || ""} image={currentChat.image} />
-      <Body /> <ChatInput />
+      <Body currentChat={currentChat} /> <ChatInput currentChat={currentChat} />
     </WrapperContainer>
   );
 };

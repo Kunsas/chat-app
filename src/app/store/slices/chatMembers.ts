@@ -28,6 +28,24 @@ export const chatMembersSlice = createSlice({
         }
       );
     },
+    // takes ChatMember's memberId and chatId
+    updateLastSeenMessageInChatMemberByMemberIdAndChatId: (
+      state,
+      action: PayloadAction<{
+        memberId: string;
+        chatId: string;
+        message: string;
+      }>
+    ) => {
+      const chatMember = state.chatMembers.find(
+        (chatMember) =>
+          chatMember.memberId === action.payload.memberId &&
+          chatMember.chatId === action.payload.chatId
+      );
+      if (chatMember) {
+        chatMember.lastSeenMessage = action.payload.message;
+      }
+    },
     // takes ChatMember's chatId
     findChatMembersByChatId: (state, action: PayloadAction<string>) => {
       state.foundChatMembersByChatId = state.chatMembers.filter(
@@ -62,6 +80,7 @@ export const {
   findChatMembersByMemberId,
   findChatMembersByChatId,
   findChatMembersByMemberIdAndChatId,
+  updateLastSeenMessageInChatMemberByMemberIdAndChatId,
   deleteChatMembersByChatId,
 } = chatMembersSlice.actions;
 export default chatMembersSlice.reducer;

@@ -35,7 +35,7 @@ export const FriendsSlice = createSlice({
         ) || null;
     },
     // takes chatId
-    findFriendsrByChatId: (state, action: PayloadAction<string>) => {
+    findFriendsByChatId: (state, action: PayloadAction<string>) => {
       state.foundFriendsByChatId =
         state.friends.find((friend) => friend.chatId === action.payload) ||
         null;
@@ -56,7 +56,7 @@ export const {
   addFriend,
   findFriendsBySender,
   findFriendsByReceiver,
-  findFriendsrByChatId,
+  findFriendsByChatId,
   deleteFriendsByChatId,
 } = FriendsSlice.actions;
 export default FriendsSlice.reducer;

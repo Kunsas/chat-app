@@ -17,6 +17,7 @@ export interface Chat {
   isGroup: boolean;
   image: string;
   lastMessage?: string;
+  readChat: boolean;
 }
 
 export interface ChatMember {
@@ -27,7 +28,20 @@ export interface ChatMember {
 
 export interface Message {
   senderId: string;
+  senderImage: string;
+  senderName: string;
   chatId: string;
   type: string;
-  content: string[];
+  messageId: string;
+  message: string;
+  content: string[] | undefined;
+  timestamp: string;
+}
+
+export interface MessageFromUser {
+  chatId: string;
+  message: Message;
+  senderImage: string;
+  senderName: string;
+  sentByLoggedInUser: boolean;
 }

@@ -6,7 +6,14 @@ import React, { useState } from "react";
 import { NewChat } from "./_component/NewChat";
 import ChatItem from "./_component/ChatItem";
 import { toast } from "sonner";
-import { Chat, ChatMember, Friend, Message, User } from "@/app/store/types";
+import {
+  Chat,
+  ChatMember,
+  Friend,
+  Message,
+  MessageFromUser,
+  User,
+} from "@/app/store/types";
 import { useAppSelector } from "../../../../hooks/useAppSelector";
 import { useAppDispatch } from "../../../../hooks/useAppDispatch";
 import { createChat, deleteChat, findChatById } from "@/app/store/slices/chats";
@@ -18,20 +25,34 @@ import {
 import {
   addChatMembers,
   deleteChatMembersByChatId,
+  findChatMembersByChatId,
+  findChatMembersByMemberIdAndChatId,
 } from "@/app/store/slices/chatMembers";
-import MoreOptions from "@/components/shared/MoreOptions";
+import {
+  createMessageFromUser,
+  deleteMessageFromUserByMessageIdAndUserId,
+} from "@/app/store/slices/messageFromUsers";
+import { format } from "date-fns";
 type Props = React.PropsWithChildren<{}>;
 
 const ChatsLayout = ({ children }: Props) => {
   const [newParticipant, setNewParticipant] = useState<User | null>(null);
   const [selectedOption, setSelectedOption] = React.useState<string>("");
   const currentChats = useAppSelector((state) => state.chats.chats);
+  const messageFromUsersByChatId = useAppSelector(
+    (state) => state.messageFromUsers.foundMessageFromUsersByChatId
+  );
+  const contentFromMessages = useAppSelector(
+    (state) => state.messages.foundContentOfMessagesByChatId
+  );
   const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
   const [chatIdToDelete, setChatIdToDelete] = useState<string>("");
 
   const dispatch = useAppDispatch();
 
   const handleNewChat = (selectedUser: User) => {
+    const placeholderMessageId = uuidv4();
+
     const directChats = currentChats.some((chat) => {
       const isDirectChat = !chat.isGroup;
       const isSameUser = chat.name === selectedUser.username;
@@ -44,40 +65,26 @@ const ChatsLayout = ({ children }: Props) => {
       console.log("inside point");
       toast.error("Chat with selected participant already exists");
     } else {
-      const placeholderMessage: Message = {
-        senderId: selectedUser.userId,
-        chatId: uuidv4(),
-        type: "string",
-        content: [
-          "heyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
-        ],
-      };
       const newChat: Chat = {
-        chatId: placeholderMessage.chatId,
+        chatId: uuidv4(),
         isGroup: false,
         name: selectedUser.username,
         image: selectedUser.image,
-        lastMessage:
-          placeholderMessage.content[placeholderMessage.content.length - 1],
+        readChat: false,
       };
       const newFriend: Friend = {
-        sender: selectedUser,
-        receiver: loggedInUser,
-        chatId: placeholderMessage.chatId,
+        sender: loggedInUser,
+        receiver: selectedUser,
+        chatId: newChat.chatId,
       };
       const loggedInUserAsChatMember: ChatMember = {
         memberId: loggedInUser.userId,
         chatId: newChat.chatId,
-        lastSeenMessage:
-          placeholderMessage.content[placeholderMessage.content.length - 1],
       };
       const newParticipantAsChatMember: ChatMember = {
         memberId: selectedUser.userId,
         chatId: newChat.chatId,
-        lastSeenMessage:
-          placeholderMessage.content[placeholderMessage.content.length - 1],
       };
-      dispatch(createMessage(placeholderMessage));
       dispatch(createChat(newChat));
       dispatch(addFriend(newFriend));
       dispatch(addChatMembers(loggedInUserAsChatMember));
@@ -92,6 +99,10 @@ const ChatsLayout = ({ children }: Props) => {
     dispatch(deleteChat(chatIdSelected));
     dispatch(deleteFriendsByChatId(chatIdSelected));
     dispatch(deleteChatMembersByChatId(chatIdSelected));
+    dispatch(findChatMembersByChatId(chatIdSelected));
+    // dispatch(
+    //   deleteMessageFromUserByMessageIdAndUserId(messageFromUsersByChatId!)
+    // );
     toast.success("Chat deleted successfully!");
   };
 
@@ -124,7 +135,9 @@ const ChatsLayout = ({ children }: Props) => {
                 key={chat.chatId}
                 id={chat.chatId}
                 username={chat.name || ""}
-                image={loggedInUser.image}
+                image={chat.image}
+                isGroup={chat.isGroup}
+                readChat={chat.readChat}
                 lastMessageSender={loggedInUser.username || ""}
                 lastMessageContent={chat.lastMessage}
                 onOptionSelect={setSelectedOption}
@@ -135,7 +148,9 @@ const ChatsLayout = ({ children }: Props) => {
                 key={chat.chatId}
                 id={chat.chatId}
                 username={chat.name || ""}
-                image={loggedInUser.image}
+                image={chat.image}
+                isGroup={chat.isGroup}
+                readChat={chat.readChat}
                 lastMessageSender={loggedInUser.username || ""}
                 lastMessageContent={chat.lastMessage}
                 onOptionSelect={setSelectedOption}
