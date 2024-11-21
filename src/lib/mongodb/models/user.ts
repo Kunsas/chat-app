@@ -2,7 +2,7 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IUser extends Document {
   username: string;
-  imageUrl?: string;
+  imageUrl: string;
   email: string;
 }
 
@@ -16,7 +16,7 @@ const UserSchema: Schema<IUser> = new mongoose.Schema<IUser>({
   },
   imageUrl: {
     type: String,
-    required: false,
+    required: [true, "User image is required"],
   },
   email: {
     type: String,

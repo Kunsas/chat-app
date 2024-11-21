@@ -82,7 +82,7 @@ function UserList({
   setOpen: (open: boolean) => void;
   setSelectedUser: (user: User) => void;
 }) {
-  const users = useAppSelector((state) => state.users.users);
+  const users: User[] = useAppSelector((state) => state.users.users);
   return (
     <Command>
       <CommandInput placeholder="Search username" />

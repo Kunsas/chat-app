@@ -1,40 +1,83 @@
 "use client";
 
 import WrapperContainer from "@/components/shared/WrapperContainer";
+import Chat from "@/lib/mongodb/models/chat";
 import { Loader2 } from "lucide-react";
-import React, { useEffect } from "react";
-import Header from "./_components/Header";
+import { useEffect, useState } from "react";
 import Body from "./_components/Body";
 import ChatInput from "./_components/ChatInput";
-import { useParams } from "next/navigation";
-import { useAppSelector } from "../../../../../hooks/useAppSelector";
+import Header from "./_components/Header";
+
+import dbConnect from "@/lib/mongodb/db";
+import Message from "@/lib/mongodb/models/message";
+import { ObjectId } from "mongodb";
 import { useChat } from "../../../../../hooks/useChat";
-import { useAppDispatch } from "../../../../../hooks/useAppDispatch";
-import { findChatById } from "@/app/store/slices/chats";
+
+interface ChatDetails {
+  _id: string;
+  chatName: string;
+  chatImageUrl: string;
+}
+
+interface MessageDetails {
+  _id: string;
+  senderImage: string;
+  senderName: string;
+  content: string;
+  createdAt: Date;
+  type: string;
+}
 
 const ChatPage = () => {
-  const chatId = useChat().chatId;
-
-  const dispatch = useAppDispatch();
+  const [chatDetails, setChatDetails] = useState<ChatDetails>();
+  const [messages, setMessages] = useState<MessageDetails[]>([]);
+  const { chatId } = useChat();
 
   useEffect(() => {
-    dispatch(findChatById(chatId));
+    const fetchData = async () => {
+      try {
+        console.log("chatId:", chatId); // Ensure chatId is correct
+        console.log("Fetching data from:", `/api/chats/${chatId}`);
+
+        const res = await fetch(`/api/chats/${chatId}`);
+        console.log(res);
+        if (!res.ok) {
+          throw new Error("Failed to fetch data");
+        }
+        const data = await res.json();
+        console.log(data);
+        if (data.chatDetails) {
+          setChatDetails(data.chatDetails);
+        }
+        if (data.messages) {
+          setMessages(data.messages);
+        } else {
+          console.error("No messages found in the response");
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
   }, [chatId]);
 
-  const currentChat = useAppSelector((state) => state.chats.foundChatByChatId);
-
-  return currentChat === undefined ? (
+  return chatDetails === undefined ? (
     <div className="w-full h-full flex items-center justify-center">
       <Loader2 className="h-8 w-8 animate-spin" />
     </div>
-  ) : currentChat === null ? (
+  ) : chatDetails === null ? (
     <p className="w-full h-full flex items-center justify-center">
       Conversation not found
     </p>
   ) : (
     <WrapperContainer>
-      <Header name={currentChat.name || ""} image={currentChat.image} />
-      <Body currentChat={currentChat} /> <ChatInput currentChat={currentChat} />
+      <Header
+        name={chatDetails.chatName || ""}
+        image={chatDetails.chatImageUrl}
+      />
+      <Body messagesInCurrentChat={messages} />{" "}
+      <ChatInput messagesInCurrentChat={messages} />
     </WrapperContainer>
   );
 };

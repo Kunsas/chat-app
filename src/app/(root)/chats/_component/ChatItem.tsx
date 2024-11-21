@@ -1,48 +1,36 @@
-import { Chat } from "@/app/store/types";
-import MoreOptions from "@/components/shared/MoreOptions";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import { useChat } from "../../../../../hooks/useChat";
 
 type Props = {
   id: string;
   image?: string;
-  username: string;
+  chatName: string;
   isGroup: boolean;
-  readChat: boolean;
-  lastMessageSender?: string;
   lastMessageContent?: string;
-  onOptionSelect: React.Dispatch<React.SetStateAction<string>>;
-  setChatIdToDelete: React.Dispatch<React.SetStateAction<string>>;
+  lastMessageSender: string;
+  lastSentTime: string;
 };
 
 const ChatItem = ({
   id,
   image,
-  username,
+  chatName,
   isGroup,
-  readChat,
-  lastMessageSender,
   lastMessageContent,
-  onOptionSelect,  setChatIdToDelete
+  lastMessageSender,
+  lastSentTime,
 }: Props) => {
-  
-  const [markReadChat, setMarkReadChat] = useState(readChat);
-  const [chatIdToRead, setChatIdToRead] = useState<string>("");
-  const isActive = useChat();
-
-  useEffect(() => {
-    if (chatIdToRead) {
-      setMarkReadChat((prev) => !prev);
-    }
-  }, [chatIdToRead]);
-
-
+  console.log(
+    id,
+    image,
+    chatName,
+    isGroup,
+    lastMessageContent,
+    lastMessageSender,
+    lastSentTime
+  );
   return (
     <Card className="w-full p-2 flex flex-row justify-between items-center gap-4 truncate">
       <div className="flex flex-row items-center gap-4 truncate">
@@ -52,14 +40,14 @@ const ChatItem = ({
         >
           <Avatar>
             <AvatarImage
-              src={image === "group" ? username.substring(0, 1) : "/" + image}
-              alt={username.substring(0, 1)}
+              src={image === "group" ? chatName.substring(0, 1) : "/" + image}
+              alt={chatName.substring(0, 1)}
               className="rounded-full"
             />
-            <AvatarFallback>{username.substring(0, 1)}</AvatarFallback>
+            <AvatarFallback>{chatName.substring(0, 1)}</AvatarFallback>
           </Avatar>
           <div className="flex flex-col truncate">
-            <h4 className="truncate">{username}</h4>
+            <h4 className="truncate">{chatName}</h4>
             {isGroup ? (
               <span className="text-sm text-muted-foreground flex truncate overflow-ellipsis">
                 <p className="font-semibold">
@@ -80,19 +68,9 @@ const ChatItem = ({
         </Link>
       </div>
       <div className="flex flex-col justify-between items-center">
-        <MoreOptions
-          chatId={id}
-          onOptionSelect={onOptionSelect}
-          setChatIdToDelete={setChatIdToDelete}
-          setChatIdToRead={setChatIdToRead}
-        />
-        { !markReadChat || !isActive ? <Badge variant="default"></Badge> : null}
-        <p
-          className={
-            "text-xs flex w-full pt-1 justify-end"
-          }
-        >
-          {format(new Date(), "HH:mm")}
+        {/* More Options */}
+        <p className={"text-xs flex w-full pt-1 justify-end"}>
+          {format(lastSentTime, "HH:mm")}
         </p>
       </div>
     </Card>

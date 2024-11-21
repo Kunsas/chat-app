@@ -1,25 +1,28 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IFriend extends Document {
-  friendId: string;
-  userId: string;
-  conversationId: string;
+  userId: mongoose.Types.ObjectId;
+  friendId: mongoose.Types.ObjectId;
+  chatId: mongoose.Types.ObjectId;
 }
 
 const FriendSchema: Schema<IFriend> = new mongoose.Schema<IFriend>({
   friendId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: [true, "FriendId is required"],
     unique: true,
   },
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
     required: [true, "UserId is required"],
     unique: true,
   },
-  conversationId: {
-    type: String,
-    required: [true, "ConversationId is required"],
+  chatId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    required: [true, "ChatId is required"],
     unique: true,
   },
 });

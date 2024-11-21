@@ -1,46 +1,41 @@
 "use client";
 
-import { useEffect } from "react";
-import { useAppDispatch } from "../../../../../../hooks/useAppDispatch";
-import { useAppSelector } from "../../../../../../hooks/useAppSelector";
 import MessageTile from "./MessageTile";
 
-import { Chat, Message } from "@/app/store/types";
-import ContainerFallback from "@/components/shared/ContainerFallback";
-import { findMessageFromUsersByChatId } from "@/app/store/slices/messageFromUsers";
+import { format } from "date-fns";
+
+interface MessageDetails {
+  _id: string;
+  senderImage: string;
+  senderName: string;
+  content: string;
+  createdAt: Date;
+  type: string;
+}
 
 type Props = {
-  currentChat: Chat;
+  messagesInCurrentChat: MessageDetails[];
 };
 
-const Body = ({ currentChat }: Props) => {
-  const dispatch = useAppDispatch();
-  const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
-  const messagesInCurrentChat = useAppSelector(
-    (state) => state.messageFromUsers.foundMessageFromUsersByChatId
-  );
-
+const Body = ({ messagesInCurrentChat }: Props) => {
   console.log(messagesInCurrentChat);
-
-  useEffect(() => {
-    dispatch(findMessageFromUsersByChatId(currentChat.chatId));
-  }, [currentChat.chatId]);
-
   return (
     <div className="w-full flex flex-1 overflow-y-scroll flex-col-reverse gap-2 p-3 no-scrollbar">
       {messagesInCurrentChat && messagesInCurrentChat.length > 0 ? (
         messagesInCurrentChat.map((message) => (
           <MessageTile
-            key={message.message.messageId}
-            fromCurrentLoggedInUser={
-              message.message.senderId === loggedInUser.userId
-            }
-            senderImage={message.message.senderImage}
-            senderName={message.message.senderName}
-            lastByUser={message.message.senderId === loggedInUser.userId}
-            content={message.message.message}
-            createdAt={message.message.timestamp}
-            type={message.message.type}
+            key={message._id}
+            // fromCurrentLoggedInUser={
+            //   message.message.senderId === loggedInUser.userId
+            // }
+            fromCurrentLoggedInUser={false}
+            senderImage={message.senderImage}
+            senderName={message.senderName}
+            // lastByUser={message.message.senderId === loggedInUser.userId}
+            lastByUser={false}
+            content={message.content}
+            createdAt={format(message.createdAt, "HH:mm")}
+            type={message.type}
           />
         ))
       ) : (

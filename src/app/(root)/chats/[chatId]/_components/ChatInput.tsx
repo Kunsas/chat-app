@@ -1,9 +1,5 @@
+import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import React, { useEffect, useRef, useState } from "react";
-import { z } from "zod";
-import { v4 as uuidv4 } from "uuid";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
@@ -11,33 +7,33 @@ import {
   FormItem,
   FormMessage,
 } from "@/components/ui/form";
-import TextareaAutosize from "react-textarea-autosize";
-import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { SendHorizonal } from "lucide-react";
-import { Chat, Message } from "@/app/store/types";
-import { useAppSelector } from "../../../../../../hooks/useAppSelector";
+import { useRef } from "react";
+import { useForm } from "react-hook-form";
+import TextareaAutosize from "react-textarea-autosize";
+import { z } from "zod";
 import { useAppDispatch } from "../../../../../../hooks/useAppDispatch";
-import { findChatMembersByChatId } from "@/app/store/slices/chatMembers";
-import {
-  createMessage,
-  findContentOfMessagesByChatId,
-  findMessagesByChatId,
-  findMessagesBySenderId,
-  updateContentInMessagesByMessageId,
-} from "@/app/store/slices/messages";
-import { findMessageFromUsersByChatId } from "@/app/store/slices/messageFromUsers";
-import { format } from "date-fns";
-import { updateLastMessageInChatByChatId } from "@/app/store/slices/chats";
+import { useAppSelector } from "../../../../../../hooks/useAppSelector";
+
+interface MessageDetails {
+  _id: string;
+  senderImage: string;
+  senderName: string;
+  content: string;
+  createdAt: Date;
+  type: string;
+}
 
 type Props = {
-  currentChat: Chat;
+  messagesInCurrentChat: MessageDetails[];
 };
 
 const chatMessageSchema = z.object({
   content: z.string().min(1, { message: "This field can't be empty" }),
 });
 
-const ChatInput = ({ currentChat }: Props) => {
+const ChatInput = ({ messagesInCurrentChat }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const dispatch = useAppDispatch();
   const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
@@ -52,11 +48,6 @@ const ChatInput = ({ currentChat }: Props) => {
   const messagesSentByLoggedInUser = useAppSelector(
     (state) => state.messages.foundMessagesBySenderId
   );
-
-  useEffect(() => {
-    dispatch(findMessageFromUsersByChatId(currentChat.chatId));
-    dispatch(findContentOfMessagesByChatId(currentChat.chatId));
-  }, [currentChat.chatId]);
 
   const form = useForm<z.infer<typeof chatMessageSchema>>({
     resolver: zodResolver(chatMessageSchema),
@@ -74,46 +65,7 @@ const ChatInput = ({ currentChat }: Props) => {
 
   const handleSend = async (values: z.infer<typeof chatMessageSchema>) => {
     console.log(messagesSentByLoggedInUser);
-    const newMessage: Message = {
-      senderId: loggedInUser.userId,
-      senderImage: loggedInUser.image,
-      senderName: loggedInUser.username,
-      chatId: currentChat.chatId,
-      type: "text",
-      messageId: uuidv4(),
-      message: values.content,
-      content: contentFromMessages
-        ? [...contentFromMessages, values.content]
-        : [values.content],
-      timestamp: format(new Date(), "HH:mm"),
-    };
-    console.log(newMessage);
-    dispatch(createMessage(newMessage));
-    dispatch(
-      updateContentInMessagesByMessageId({
-        messageId: newMessage.messageId,
-        messageContent: newMessage.message,
-      })
-    );
-    dispatch(
-      updateLastMessageInChatByChatId({
-        chatId: currentChat.chatId,
-        message: newMessage.message,
-      })
-    );
-    dispatch(findChatMembersByChatId(currentChat.chatId));
-    dispatch(findMessagesByChatId(currentChat.chatId));
-    dispatch(findMessageFromUsersByChatId(currentChat.chatId));
-    dispatch(findMessagesBySenderId(loggedInUser.userId));
-    console.log("chatsFromStore", chatsFromStore);
-    console.log(
-      "New Message",
-      newMessage,
-      "currentChatMessagesWithUsers",
-      currentChatMessagesWithUsers,
-      "contentFromMessages",
-      contentFromMessages
-    );
+
     form.reset();
   };
 
