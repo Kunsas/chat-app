@@ -9,12 +9,9 @@ import {
 } from "@/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SendHorizonal } from "lucide-react";
-import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import TextareaAutosize from "react-textarea-autosize";
 import { z } from "zod";
-import { useAppDispatch } from "../../../../../../hooks/useAppDispatch";
-import { useAppSelector } from "../../../../../../hooks/useAppSelector";
 
 interface MessageDetails {
   _id: string;
@@ -34,21 +31,6 @@ const chatMessageSchema = z.object({
 });
 
 const ChatInput = ({ messagesInCurrentChat }: Props) => {
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const dispatch = useAppDispatch();
-  const loggedInUser = useAppSelector((state) => state.users.loggedInUser);
-  const chatsFromStore = useAppSelector((state) => state.chats.chats);
-  const contentFromMessages = useAppSelector(
-    (state) => state.messages.foundContentOfMessagesByChatId
-  );
-  const currentChatMessagesWithUsers = useAppSelector(
-    (state) => state.messageFromUsers.foundMessageFromUsersByChatId
-  );
-
-  const messagesSentByLoggedInUser = useAppSelector(
-    (state) => state.messages.foundMessagesBySenderId
-  );
-
   const form = useForm<z.infer<typeof chatMessageSchema>>({
     resolver: zodResolver(chatMessageSchema),
     defaultValues: {
@@ -64,8 +46,6 @@ const ChatInput = ({ messagesInCurrentChat }: Props) => {
   };
 
   const handleSend = async (values: z.infer<typeof chatMessageSchema>) => {
-    console.log(messagesSentByLoggedInUser);
-
     form.reset();
   };
 

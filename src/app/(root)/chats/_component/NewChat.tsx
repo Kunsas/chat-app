@@ -24,24 +24,21 @@ import {
 } from "@/components/ui/popover";
 import { useMediaQuery } from "../../../../../hooks/useMediaQuery";
 import { Plus } from "lucide-react";
-import { User } from "@/app/store/types";
-import { useAppSelector } from "../../../../../hooks/useAppSelector";
+import User from "@/lib/mongodb/models/user";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-type Props = {
-  onNewChat: React.Dispatch<React.SetStateAction<User | null>>;
-};
+type Props = {};
 
-export function NewChat({ onNewChat }: Props) {
+export function NewChat() {
   const [open, setOpen] = React.useState(false);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const [selectedUser, setSelectedUser] = React.useState<User>();
+  const [selectedUser, setSelectedUser] = React.useState();
 
-  React.useEffect(() => {
-    if (selectedUser) {
-      onNewChat(selectedUser);
-    }
-  }, [selectedUser, onNewChat]);
+  // React.useEffect(() => {
+  //   if (selectedUser) {
+  //     onNewChat(selectedUser);
+  //   }
+  // }, [selectedUser, onNewChat]);
 
   if (isDesktop) {
     return (
@@ -82,7 +79,6 @@ function UserList({
   setOpen: (open: boolean) => void;
   setSelectedUser: (user: User) => void;
 }) {
-  const users: User[] = useAppSelector((state) => state.users.users);
   return (
     <Command>
       <CommandInput placeholder="Search username" />

@@ -5,10 +5,10 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
 
 type Props = {
-  fromCurrentLoggedInUser: boolean;
+  fromCurrentLoggedInUser?: boolean;
   senderImage: string;
   senderName: string;
-  lastByUser: boolean;
+  lastByUser?: boolean;
   content?: string;
   createdAt: string;
   type: string;

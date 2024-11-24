@@ -22,15 +22,6 @@ const ChatItem = ({
   lastMessageSender,
   lastSentTime,
 }: Props) => {
-  console.log(
-    id,
-    image,
-    chatName,
-    isGroup,
-    lastMessageContent,
-    lastMessageSender,
-    lastSentTime
-  );
   return (
     <Card className="w-full p-2 flex flex-row justify-between items-center gap-4 truncate">
       <div className="flex flex-row items-center gap-4 truncate">

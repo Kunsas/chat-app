@@ -1,53 +1,35 @@
 "use client";
 
 import WrapperContainer from "@/components/shared/WrapperContainer";
-import Chat from "@/lib/mongodb/models/chat";
 import { Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import Body from "./_components/Body";
 import ChatInput from "./_components/ChatInput";
 import Header from "./_components/Header";
 
-import dbConnect from "@/lib/mongodb/db";
-import Message from "@/lib/mongodb/models/message";
-import { ObjectId } from "mongodb";
 import { useChat } from "../../../../../hooks/useChat";
-
-interface ChatDetails {
-  _id: string;
-  chatName: string;
-  chatImageUrl: string;
-}
-
-interface MessageDetails {
-  _id: string;
-  senderImage: string;
-  senderName: string;
-  content: string;
-  createdAt: Date;
-  type: string;
-}
+import {
+  ChatDetailsResponse,
+  MessageDetailsResponse,
+} from "@/app/api/models/apiRequests";
 
 const ChatPage = () => {
-  const [chatDetails, setChatDetails] = useState<ChatDetails>();
-  const [messages, setMessages] = useState<MessageDetails[]>([]);
+  const [chatDetails, setChatDetails] = useState<ChatDetailsResponse>();
+  const [messages, setMessages] = useState<MessageDetailsResponse[]>([]);
   const { chatId } = useChat();
+
+  console.log(chatDetails);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log("chatId:", chatId); // Ensure chatId is correct
-        console.log("Fetching data from:", `/api/chats/${chatId}`);
-
         const res = await fetch(`/api/chats/${chatId}`);
-        console.log(res);
         if (!res.ok) {
           throw new Error("Failed to fetch data");
         }
         const data = await res.json();
-        console.log(data);
         if (data.chatDetails) {
-          setChatDetails(data.chatDetails);
+          setChatDetails(data.chatDetails[0]);
         }
         if (data.messages) {
           setMessages(data.messages);
@@ -73,7 +55,7 @@ const ChatPage = () => {
   ) : (
     <WrapperContainer>
       <Header
-        name={chatDetails.chatName || ""}
+        name={chatDetails.chatName || "No username"}
         image={chatDetails.chatImageUrl}
       />
       <Body messagesInCurrentChat={messages} />{" "}
